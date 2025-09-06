@@ -5,13 +5,9 @@
 # returns how strong or weak your password is against malicious attempts
 # to access the website or information stored behind said password
 
-
-#TODO Comment this professionally please...
-
-
-
 import string
 import getpass
+import tkinter
 
 #Defines the structure of what we look for in a passwor to determine its strength.
 class aPassword:
@@ -47,6 +43,11 @@ def want_more_specifics_timewise_on_brekabilitiy(timeToBreak) -> None:
         print("Your password will be broken instantly.")
     else:
         print(f"It should take a hacker {timeToBreak} to break your password.")
+
+#Tells the user if their password is weak, medium, or strong
+def how_strong_is_this_pw(current_strength) -> None:
+    print(f"Your current password is {current_strength}.")
+
 
 
 #Checks if the password contains only numbers making it the least secure type of password
@@ -93,6 +94,8 @@ def is_pw_only_lower(pw) -> bool:
 
 
 #Checks if the password contains symbols
+
+#TODO symbols are being considered mulicase passwords...
 def does_pw_have_symbols(pw) -> bool:
     num_of_symbols = 0
     for char in pw:
@@ -103,8 +106,6 @@ def does_pw_have_symbols(pw) -> bool:
         return True
     else:
         return False
-    #if yes & case sensitive & nums-symbol plus to difficulty- 
-    #if no and is case sensitive and !onlyNums use case+num part of chart
 
 #Checks if the password is in the top 10 million most commonly used passwords
 def in_Top_10mill_Easy_Pw_Pwnd(pw) -> bool:
@@ -121,7 +122,6 @@ def in_Top_10mill_Easy_Pw_Pwnd(pw) -> bool:
 #There are a few tweaks to it based on my own belief, mainly any password that can be
 #broken in a lifetime is considered weak.
 def is_weak_medium_or_strong(pw) -> string:
-
     #Checks the numbers only passwords.
     if password.allNumbers is True:
         match password.length:
@@ -170,28 +170,33 @@ def is_weak_medium_or_strong(pw) -> string:
                 return "Strong"
 
         
-
-
 #Determine based on the characterisitics of the password which set of time tables it should search in.
 def check_pw_complexity(pw):
     #Checks for symbols first (only shown in one case)
     if password.hasSymbols is True:
+        how_strong_is_this_pw(is_weak_medium_or_strong(pw))
         want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_Num_BothCase_Symbols(pw))
     else:
         #Checks if the password is case sensitive
         if password.caseSensitive is True:
             #Checks if there are numbers in the password or not
             if nums_in_pw > 0:
+                how_strong_is_this_pw(is_weak_medium_or_strong(pw))
                 want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_num_BothCase(pw))
             elif nums_in_pw == 0:
+                how_strong_is_this_pw(is_weak_medium_or_strong(pw))
                 want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_BothCase(pw))
         else:
-
+            #Checks for passwords that are just lowercase with some numbers
+            #This is specifically considering this password as only lowercase as I do not have data on lowercase numbers
+            #and lowercase numbers is less secure than both cases and numbers so I chose the lesser password brute force time
+            #to not overinflate the strength of the password.
             if password.allNumbers is False:
-                #TODO why is this like this... basically lowercase with numbers but not all numbers. why test lowercase only... 
-                #It is considered better than numbers... (only thought process I can think of... who let me code during Procotoring shifts)
-                want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_lowerCase(pw))        
+                how_strong_is_this_pw(is_weak_medium_or_strong(pw))
+                want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_lowerCase(pw))     
+        #Ensures that symbols are not considered numbers   
         if password.allNumbers is True and password.hasSymbols is False:
+                how_strong_is_this_pw(is_weak_medium_or_strong(pw))
                 want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_num(pw))
 
 #If a password contains numbers, upper and lower case, and symbols get time to break here:

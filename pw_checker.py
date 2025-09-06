@@ -160,7 +160,8 @@ def is_weak_medium_or_strong(pw) -> string:
             case _:
                 return "Strong"
     #Checks the letter, number, and symbol passwords.
-    if password.caseSensitive is True and nums_in_pw > 0 and password.hasSymbols is True:
+    #password.caseSensitive is True and nums_in_pw > 0 and -- removed
+    if password.hasSymbols is True:
         match password.length:
             case 1 | 2 | 3 | 4 | 5 | 6 | 7:
                 return "Weak"

@@ -7,7 +7,7 @@
 
 import string
 import getpass
-import tkinter
+
 
 #Defines the structure of what we look for in a passwor to determine its strength.
 class aPassword:
@@ -72,7 +72,7 @@ def is_pw_case_sensitive(pw) -> bool:
         elif char.islower():
             lower+=1
 
-    if upper>1 and lower>1:
+    if upper>0 and lower>0:
         return True
     else: 
         return False
@@ -102,7 +102,7 @@ def does_pw_have_symbols(pw) -> bool:
         for char2 in symbols:
             if char == char2:
                 num_of_symbols+=1
-    if num_of_symbols > 1:
+    if num_of_symbols > 0:
         return True
     else:
         return False
@@ -123,7 +123,7 @@ def in_Top_10mill_Easy_Pw_Pwnd(pw) -> bool:
 #broken in a lifetime is considered weak.
 def is_weak_medium_or_strong(pw) -> string:
     #Checks the numbers only passwords.
-    if password.allNumbers is True:
+    if password.allNumbers is True and password.hasSymbols is False:
         match password.length:
             case 1 | 2 | 3| 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14:
                 return "Weak"
@@ -131,9 +131,9 @@ def is_weak_medium_or_strong(pw) -> string:
                 return "Medium"
             case _:
                 # determine what to do here
-                return "Strorng"
+                return "Strong"
     # Checks the letters only passwords.
-    if password.caseSensitive is True:
+    if password.caseSensitive is True and password.hasSymbols is False:
         match password.length:
             case 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8:
                 return "Weak"
@@ -141,7 +141,7 @@ def is_weak_medium_or_strong(pw) -> string:
                 return "Medium"
             case _:
                 return "Strong"
-    else:
+    elif password.caseSensitive is False and password.hasSymbols is False:
         match password.length:
             case 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10:
                 return "Weak"
@@ -151,7 +151,7 @@ def is_weak_medium_or_strong(pw) -> string:
                 return "Strong"
     
     #Checks the letter and number passwords
-    if password.caseSensitive is True and nums_in_pw > 0:
+    if password.caseSensitive is True and nums_in_pw > 0 and password.hasSymbols is False:
         match password.length:
             case 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8:
                 return "Weak"
@@ -180,7 +180,7 @@ def check_pw_complexity(pw):
         #Checks if the password is case sensitive
         if password.caseSensitive is True:
             #Checks if there are numbers in the password or not
-            if nums_in_pw > 0:
+            if nums_in_pw > 0 and password.hasSymbols is False:
                 how_strong_is_this_pw(is_weak_medium_or_strong(pw))
                 want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_num_BothCase(pw))
             elif nums_in_pw == 0:

@@ -26,9 +26,11 @@ password = aPassword(0, False, False, False)
 symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "=", "_", "+", "<" , ">", ",", ".", "/", "?", "'", ":", ";", "`", "~", "\""]
 nums_in_pw = 0
 
-#
+#Puts password through tests to determine what catagory of time breakability it is in
 def password_strength_checker():
+    #Grabs users password without anyone being able to see the password or its length
     passwordRequest = getpass.getpass("Enter password to check its strength: ")
+    #Fill in password class 
     password.hasSymbols = does_pw_have_symbols(passwordRequest)
     password.caseSensitive = is_pw_case_sensitive(passwordRequest)
     password.length = len(passwordRequest)
@@ -41,8 +43,6 @@ def password_strength_checker():
 
 #Lets users know how long it could take a user to hack/break into their password.
 def want_more_specifics_timewise_on_brekabilitiy(timeToBreak) -> None:
-    #dish out based on score, # only, lowercase only, upper and lower, num upper and lower, num, symbol, upper and lower
-    # and length of password to give them a more accurate example of the strength (or weakness) of their password
     if timeToBreak == "Instantly" :
         print("Your password will be broken instantly.")
     else:
@@ -56,8 +56,6 @@ def is_pw_only_nums(password) -> bool:
             global nums_in_pw
             nums_in_pw+=1
 
-    #if only numbers its here!
-    # if length of pw = # of ints in pw TRUE else FALSE
     if len(password) == nums_in_pw:
         return True
     else:
@@ -83,15 +81,18 @@ def is_pw_case_sensitive(pw) -> bool:
 def is_pw_only_lower(pw) -> bool:
     lower_in_pw = 0
     for char in pw:
+        #not sure if the (for sym...) actually does anything... TODO Check.../Tests...
         for sym in symbols:
-            if char.islower():
+            if char.islower() and char!=sym:
                 lower_in_pw+=1
+
     if len(pw) == lower_in_pw:
         return True
     else:
         return False
 
 
+#Checks if the password contains symbols
 def does_pw_have_symbols(pw) -> bool:
     num_of_symbols = 0
     for char in pw:
@@ -105,6 +106,7 @@ def does_pw_have_symbols(pw) -> bool:
     #if yes & case sensitive & nums-symbol plus to difficulty- 
     #if no and is case sensitive and !onlyNums use case+num part of chart
 
+#Checks if the password is in the top 10 million most commonly used passwords
 def in_Top_10mill_Easy_Pw_Pwnd(pw) -> bool:
     fileObj = r"C:\Users\laure\Downloads\100k-most-used-passwords-NCSC.txt"
     with open(fileObj, "r") as file:
@@ -114,23 +116,85 @@ def in_Top_10mill_Easy_Pw_Pwnd(pw) -> bool:
                  return True
     return False
 
+#Tells the user how strong their password is
+#This is based on Hive Systems "Time it takes a hacker to brute force your password in 2025"
+#There are a few tweaks to it based on my own belief, mainly any password that can be
+#broken in a lifetime is considered weak.
+def is_weak_medium_or_strong(pw) -> string:
 
+    #Checks the numbers only passwords.
+    if password.allNumbers is True:
+        match password.length:
+            case 1 | 2 | 3| 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14:
+                return "Weak"
+            case 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22:
+                return "Medium"
+            case _:
+                # determine what to do here
+                return "Strorng"
+    # Checks the letters only passwords.
+    if password.caseSensitive is True:
+        match password.length:
+            case 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8:
+                return "Weak"
+            case 9 | 10 | 11 | 12 | 13:
+                return "Medium"
+            case _:
+                return "Strong"
+    else:
+        match password.length:
+            case 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10:
+                return "Weak"
+            case  11 | 12 | 13 | 14 | 15:
+                return "Medium"
+            case _:
+                return "Strong"
+    
+    #Checks the letter and number passwords
+    if password.caseSensitive is True and nums_in_pw > 0:
+        match password.length:
+            case 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8:
+                return "Weak"
+            case 9 | 10 | 11 | 12:
+                return "Medium"
+            case _:
+                return "Strong"
+    #Checks the letter, number, and symbol passwords.
+    if password.caseSensitive is True and nums_in_pw > 0 and password.hasSymbols is True:
+        match password.length:
+            case 1 | 2 | 3 | 4 | 5 | 6 | 7:
+                return "Weak"
+            case  8 | 9 | 10 | 11 | 12:
+                return "Medium"
+            case _:
+                return "Strong"
+
+        
+
+
+#Determine based on the characterisitics of the password which set of time tables it should search in.
 def check_pw_complexity(pw):
+    #Checks for symbols first (only shown in one case)
     if password.hasSymbols is True:
         want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_Num_BothCase_Symbols(pw))
     else:
+        #Checks if the password is case sensitive
         if password.caseSensitive is True:
+            #Checks if there are numbers in the password or not
             if nums_in_pw > 0:
                 want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_num_BothCase(pw))
             elif nums_in_pw == 0:
                 want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_BothCase(pw))
         else:
+
             if password.allNumbers is False:
+                #TODO why is this like this... basically lowercase with numbers but not all numbers. why test lowercase only... 
+                #It is considered better than numbers... (only thought process I can think of... who let me code during Procotoring shifts)
                 want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_lowerCase(pw))        
         if password.allNumbers is True and password.hasSymbols is False:
                 want_more_specifics_timewise_on_brekabilitiy(get_Time_Case_for_num(pw))
 
-
+#If a password contains numbers, upper and lower case, and symbols get time to break here:
 def get_Time_Case_for_Num_BothCase_Symbols(pw) -> string:
     match len(pw):
         case 1 | 2 | 3 | 4:
@@ -170,7 +234,7 @@ def get_Time_Case_for_Num_BothCase_Symbols(pw) -> string:
         case _:
             return "longer than 463 quintillion years"
 
-
+#If a password contains numbers, and upper and lower case get time to break here:
 def get_Time_Case_for_num_BothCase(pw) -> string:
     match len(pw):
         case 1 | 2 | 3 | 4:
@@ -210,7 +274,7 @@ def get_Time_Case_for_num_BothCase(pw) -> string:
         case _:
             return "longer than 52 quintillion years"
 
-
+#If a password contains upper and lower case, get time to break here:
 def get_Time_Case_for_BothCase(pw) -> string:
     match len(pw):
         case 1 | 2 | 3 | 4:
@@ -252,6 +316,8 @@ def get_Time_Case_for_BothCase(pw) -> string:
 
 
 ##TODO Symbols are being considered as lowercase...
+
+#If a password contains lower case only get time to break here:
 def get_Time_Case_for_lowerCase(pw) -> string:
     match len(pw):
         case 1 | 2 | 3 | 4 | 5:
@@ -290,6 +356,7 @@ def get_Time_Case_for_lowerCase(pw) -> string:
             return "longer than 8 trillion years"
 
 
+#If a password contains numbers only, get time to break here:
 def get_Time_Case_for_num(pw) -> string:
     match len(pw):
         case 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8:
@@ -319,7 +386,6 @@ def get_Time_Case_for_num(pw) -> string:
             return "284k years"
         case _:
             return "Longer than 284k years"
-
 
 
 def main():
